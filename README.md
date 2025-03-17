@@ -27,9 +27,9 @@ Below are some setup steps that are required to ensure a success deployment of t
 - npm install
 - to run locally: node app.js
 - cf login
-- cf push ui5node-poc-embedding -k 256MB -m 256MB
-- cf set-env ui5node-poc-embedding PY_ENDPOINT https://indb-embedding.cfapps.eu12.hana.ondemand.com
-- cf restart ui5node-poc-embedding
+- cf push ui5node-poc-knowledgegraph -k 256MB -m 256MB
+- cf set-env ui5node-poc-knowledgegraph PY_ENDPOINT https://indb-embedding.cfapps.eu12.hana.ondemand.com
+- cf restart ui5node-poc-knowledgegraph
 
 ### todo
 - [done] decouple env variables

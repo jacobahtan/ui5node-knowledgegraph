@@ -27,16 +27,19 @@
 				<Image height="2.5rem"
 					   class="sapUiTinyMargin"
 					   src="https://cdn-icons-gif.flaticon.com/17556/17556499.gif" />
-				<Title level="H6" text="Smart Advisory Companion" class="sapUiNoMargin .sapTntToolHeader .sapMTitle" wrapping="true" id="productName">
-					<layoutData>
-						<OverflowToolbarLayoutData priority="Disappear"/>
-					</layoutData>
+				<VBox class="sapUiNoMargin sapUiSmallMarginTop">
+				<Title text="Smart Advisory Companion" class="sapUiSmallMarginTop titleWithOverlapLabel" wrapping="true" id="productName">
 				</Title>
+				<Label text="Knowledge Graph edition" class="overlappingLabel" labelFor="productName" vAlign="Bottom"/>
+				<!-- <tnt:InfoLabel text="Knowledge Graph" icon="" colorScheme="7" width="" class="sapUiNoMargin"/> -->
+				</VBox>
+				<tnt:InfoLabel id="" text="UNDER DEVELOPMENT" icon="sap-icon://vehicle-repair" colorScheme="7" width="" class="sapUiTinyMargin"/>
 				<Text text="" wrapping="false" id="secondTitle">
 					<layoutData>
 						<OverflowToolbarLayoutData priority="Disappear"/>
 					</layoutData>
 				</Text>
+				
 				<ToolbarSpacer />
 				<ToolbarSpacer id="spacer">
 					<layoutData>
@@ -118,7 +121,9 @@
 					<Page id="page1" showHeader="false" busy="{ui>/busy}" busyIndicatorDelay="0">
                         <headerContent></headerContent>
                         <content>
-							<core:Fragment fragmentName="chat.view.FPage1Welcome" id="FPage1Welcome" type="XML"/>
+							<VBox class="sapUiNoMargin">
+								<core:Fragment fragmentName="chat.view.FPage1Welcome" id="FPage1Welcome" type="XML"/>
+							</VBox>
                         </content>
                         <footer></footer>
                     </Page>
@@ -177,6 +182,34 @@
                         </headerContent>
                         <content>
 							<core:Fragment fragmentName="chat.view.FPage5CategoryMgmt" id="FPage5CategoryMgmt" type="XML"/>
+                        </content>
+                        <footer></footer>
+                    </Page>
+					<Page id="page6" floatingFooter="false" busy="{ui>/busy}" busyIndicatorDelay="0">
+                        <headerContent>
+                            <Title text="Advisory Exploration" class="sapUiSmallMargin"/>
+                            <ToolbarSpacer />
+							<!-- <Label text="Auto Refresh:"/>
+							<Switch change="onClusterExpAutoRefresh" state="false">
+								<layoutData>
+									<FlexItemData growFactor="1" />
+								</layoutData>
+							</Switch> -->
+                        </headerContent>
+                        <content>
+							<core:Fragment fragmentName="chat.view.FPage6DataExploration" id="FPage6DataExploration" type="XML"/>
+                        </content>
+                        <footer>
+                        </footer>
+                    </Page>
+					<Page id="page7" floatingFooter="false" busy="{ui>/busy}" busyIndicatorDelay="0">
+                        <headerContent>
+                            <Title text="Enhanced Advisory Buddy" class="sapUiSmallMargin"/>
+                            <ToolbarSpacer />
+							<ToolbarSpacer />
+                        </headerContent>
+                        <content>
+							<core:Fragment fragmentName="chat.view.FPage7EnhancedAdvisoryBuddy" id="FPage7EnhancedAdvisoryBuddy" type="XML"/>
                         </content>
                         <footer></footer>
                     </Page>

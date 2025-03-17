@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ontology Network Graph</title>
+    
+    <!-- SAPUI5 Bootstrap -->
+    <script id="sap-ui-bootstrap"
+        src="https://sapui5.hana.ondemand.com/1.120.19/resources/sap-ui-core.js"
+        data-sap-ui-theme="sap_horizon"
+        data-sap-ui-libs="sap.m,sap.suite.ui.commons"
+        data-sap-ui-compatVersion="edge"
+        data-sap-ui-async="true"
+        data-sap-ui-resourceroots='{
+            "ontology.viewer": "./"
+        }'>
+    </script>
+    
+    <script>
+        sap.ui.require([
+            "sap/ui/core/mvc/XMLView",
+            "sap/ui/core/mvc/Controller",
+            "sap/ui/model/json/JSONModel",
+            "sap/m/MessageToast"
+        ], function(XMLView, Controller, JSONModel, MessageToast) {
+            "use strict";
+            
+            // Register the controller
+            Controller.extend("ontology.viewer.OntologyGraphController", {
+                onInit: function() {
+                    // Mock data representing the SPARQL query result
+                    const ontologyData = this.generateOntologyData();
+                    
+                    // Create model from the ontology data
+                    const oModel = new JSONModel(ontologyData);
+                    this.getView().setModel(oModel);
+                    
+                    // Get graph control
+                    this._graph = this.byId("ontologyGraph");
+                    
+                    // Wait for graph to be fully initialized
+                    this._graph.attachEvent("graphReady", function() {
+                        MessageToast.show("Ontology Graph Loaded");
+                    });
+                },
+                
+                generateOntologyData: function() {
+                    // This function generates sample data to represent an ontology
+                    
+                    // Define node categories
+                    const nodeCategories = {
+                        class: { icon: "sap-icon://hierarchy" },
+                        instance: { icon: "sap-icon://instance" },
+                        dataProperty: { icon: "sap-icon://key" },
+                        objectProperty: { icon: "sap-icon://link" }
+                    };
+                    
+                    // Create node groups
+                    const groups = [
+                        { key: "g1", title: "Classes" },
+                        { key: "g2", title: "Instances" },
+                        { key: "g3", title: "Properties" }
+                    ];
+                    
+                    // Create nodes based on the ontology
+                    const nodes = [
+                        // Classes
+                        { 
+                            key: "n1", 
+                            title: "TechnicalAdvisor", 
+                            icon: nodeCategories.class.icon, 
+                            group: "g1",
+                            attributes: [
+                                { label: "Type", value: "Class" }
+                            ]
+                        },
+                        { 
+                            key: "n2", 
+                            title: "TechnicalIssue", 
+                            icon: nodeCategories.class.icon, 
+                            group: "g1",
+                            attributes: [
+                                { label: "Type", value: "Class" }
+                            ]
+                        },
+                        { 
+                            key: "n3", 
+                            title: "Solution", 
+                            icon: nodeCategories.class.icon, 
+                            group: "g1",
+                            attributes: [
+                                { label: "Type", value: "Class" }
+                            ]
+                        },
+                        { 
+                            key: "n4", 
+                            title: "Equipment", 
+                            icon: nodeCategories.class.icon, 
+                            group: "g1",
+                            attributes: [
+                                { label: "Type", value: "Class" }
+                            ]
+                        },
+                        { 
+                            key: "n5", 
+                            title: "MaintenanceRecord", 
+                            icon: nodeCategories.class.icon, 
+                            group: "g1",
+                            attributes: [
+                                { label: "Type", value: "Class" }
+                            ]
+                        },
+                        
+                        // Instances
+                        { 
+                            key: "n6", 
+                            title: "Advisor_001", 
+                            icon: nodeCategories.instance.icon, 
+                            group: "g2",
+                            attributes: [
+                                { label: "Type", value: "TechnicalAdvisor" }, 
+                                { label: "Expertise", value: "Hydraulics" }
+                            ]
+                        },
+                        { 
+                            key: "n7", 
+                            title: "Issue_XYZ", 
+                            icon: nodeCategories.instance.icon, 
+                            group: "g2",
+                            attributes: [
+                                { label: "Type", value: "TechnicalIssue" }, 
+                                { label: "Priority", value: "High" }
+                            ]
+                        },
+                        { 
+                            key: "n8", 
+                            title: "Solution_ABC", 
+                            icon: nodeCategories.instance.icon, 
+                            group: "g2",
+                            attributes: [
+                                { label: "Type", value: "Solution" }, 
+                                { label: "Approved", value: "Yes" }
+                            ]
+                        },
+                        
+                        // Properties
+                        { 
+                            key: "n9", 
+                            title: "hasExpertise", 
+                            icon: nodeCategories.dataProperty.icon, 
+                            group: "g3",
+                            attributes: [
+                                { label: "Type", value: "DataProperty" }
+                            ]
+                        },
+                        { 
+                            key: "n10", 
+                            title: "resolves", 
+                            icon: nodeCategories.objectProperty.icon, 
+                            group: "g3",
+                            attributes: [
+                                { label: "Type", value: "ObjectProperty" }
+                            ]
+                        },
+                        { 
+                            key: "n11", 
+                            title: "assignedTo", 
+                            icon: nodeCategories.objectProperty.icon, 
+                            group: "g3",
+                            attributes: [
+                                { label: "Type", value: "ObjectProperty" }
+                            ]
+                        },
+                        { 
+                            key: "n12", 
+                            title: "requiresEquipment", 
+                            icon: nodeCategories.objectProperty.icon, 
+                            group: "g3",
+                            attributes: [
+                                { label: "Type", value: "ObjectProperty" }
+                            ]
+                        }
+                    ];
+                    
+                    // Create connections (lines) between nodes
+                    const lines = [
+                        // Class hierarchy
+                        { from: "n1", to: "n6", title: "instanceOf" },
+                        { from: "n2", to: "n7", title: "instanceOf" },
+                        { from: "n3", to: "n8", title: "instanceOf" },
+                        
+                        // Object properties
+                        { from: "n6", to: "n7", title: "assignedTo" },
+                        { from: "n8", to: "n7", title: "resolves" },
+                        { from: "n8", to: "n4", title: "requiresEquipment" },
+                        { from: "n5", to: "n4", title: "relatesToEquipment" },
+                        
+                        // Property domains and ranges
+                        { from: "n10", to: "n3", title: "domain" },
+                        { from: "n10", to: "n2", title: "range" },
+                        { from: "n11", to: "n2", title: "domain" },
+                        { from: "n11", to: "n1", title: "range" }
+                    ];
+                    
+                    return {
+                        nodes: nodes,
+                        lines: lines,
+                        groups: groups
+                    };
+                },
+                
+                onZoomIn: function() {
+                    this._graph.zoomIn();
+                },
+                
+                onZoomOut: function() {
+                    this._graph.zoomOut();
+                },
+                
+                onResetGraph: function() {
+                    this._graph.reset();
+                    MessageToast.show("Graph Reset");
+                },
+                
+                onLinePress: function(oEvent) {
+                    const oLine = oEvent.getSource();
+                    MessageToast.show("Relationship: " + oLine.getTitle());
+                }
+            });
+
+            // Create XML view as a string
+            var sXmlViewContent = 
+            '<mvc:View xmlns:mvc="sap.ui.core.mvc" ' +
+            '         xmlns="sap.m" ' +
+            '         xmlns:ng="sap.suite.ui.commons.networkgraph" ' +
+            '         controllerName="ontology.viewer.OntologyGraphController" ' +
+            '         displayBlock="true" ' +
+            '         height="100%">' +
+            '    <Page title="Smart Technical Advisory Ontology Visualization" enableScrolling="false">' +
+            '        <content>' +
+            '            <ng:Graph ' +
+            '                id="ontologyGraph" ' +
+            '                layout="LayeredTop" ' +
+            '                height="calc(100vh - 96px)" ' +
+            '                width="100%" ' +
+            '                nodes="{/nodes}" ' +
+            '                lines="{/lines}" ' +
+            '                groups="{/groups}">' +
+            '                <ng:nodes>' +
+            '                    <ng:Node ' +
+            '                        key="{key}" ' +
+            '                        title="{title}" ' +
+            '                        icon="{icon}" ' +
+            '                        group="{group}" ' +
+            '                        shape="Box">' +
+            '                        <ng:attributes>' +
+            '                            <ng:ElementAttribute ' +
+            '                                label="{label}" ' +
+            '                                value="{value}" />' +
+            '                        </ng:attributes>' +
+            '                    </ng:Node>' +
+            '                </ng:nodes>' +
+            '                <ng:lines>' +
+            '                    <ng:Line ' +
+            '                        from="{from}" ' +
+            '                        to="{to}" ' +
+            '                        title="{title}" ' +
+            '                        arrowPosition="End" ' +
+            '                        press="onLinePress">' +
+            '                    </ng:Line>' +
+            '                </ng:lines>' +
+            '                <ng:groups>' +
+            '                    <ng:Group ' +
+            '                        key="{key}" ' +
+            '                        title="{title}">' +
+            '                    </ng:Group>' +
+            '                </ng:groups>' +
+            '            </ng:Graph>' +
+            '        </content>' +
+            '        <footer>' +
+            '            <OverflowToolbar>' +
+            '                <Button text="Zoom In" press="onZoomIn" icon="sap-icon://zoom-in" />' +
+            '                <Button text="Zoom Out" press="onZoomOut" icon="sap-icon://zoom-out" />' +
+            '                <Button text="Reset" press="onResetGraph" icon="sap-icon://reset" />' +
+            '                <ToolbarSpacer />' +
+            '                <Text text="Smart Technical Advisory Ontology" />' +
+            '            </OverflowToolbar>' +
+            '        </footer>' +
+            '    </Page>' +
+            '</mvc:View>';
+
+            // Create the view and place it
+            XMLView.create({
+                definition: sXmlViewContent
+            }).then(function(oView) {
+                oView.placeAt("content");
+            }).catch(function(err) {
+                console.error("Error creating view:", err);
+                document.getElementById("content").innerHTML = 
+                    "<div style='color:red; padding:20px;'>" + 
+                    "<h2>Error Creating View</h2>" +
+                    "<p>" + err.message + "</p>" +
+                    "<pre>" + err.stack + "</pre>" +
+                    "</div>";
+            });
+        });
+    </script>
+</head>
+<body class="sapUiBody" id="content">
+    <div style="padding: 20px; text-align: center;">
+        <h2>Loading Ontology Network Graph...</h2>
+        <p>Please wait while the SAPUI5 framework initializes.</p>
+    </div>
+</body>
+</html>

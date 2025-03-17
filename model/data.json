@@ -20,6 +20,23 @@
 			"visible": true
 		},
 		{
+			"title": "Advisory Explorer",
+			"icon": "sap-icon://explorer",
+			"enabled": true,
+			"visible": true,
+			"expanded": true,
+			"items": [
+				{
+					"title": "Data Blueprint Discovery",
+					"key": "page6"
+				},
+				{
+					"title": "Enhanced Advisory Buddy",
+					"key": "page7"
+				}
+			]
+		},
+		{
 			"title": "Manager Cockpit",
 			"icon": "sap-icon://customer-view",
 			"enabled": true,
