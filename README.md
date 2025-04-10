@@ -1,22 +1,18 @@
 # Smart Advisory Companion: A Node.js Microservice on Cloud Foundry
 
-This project showcases a simple Node.js application, deployed on Cloud Foundry, designed to demonstrate a streamlined user journey for advisory request support. Acting as a smart advisory companion, it empowers users by delivering actionable insights directly related to their requests.
-
-Leveraging a standalone Node.js architecture, chosen for its seamless integration with our existing Python-based proxy APIs, which will be elaborated in the pre-requisites.
+...
 
 > [!IMPORTANT]
-Please note that this proof of concept could serve as an inspiration for you partners who are looking to develop your own solution adopting Generative AI, specifically SAP AI Core (extended service plan).
+Work in Progress
 
 ## Business Scenario
-[<img src="https://github.com/user-attachments/assets/3a28e5de-8c1d-4a76-a189-fd5f2eaeb589"/>](https://github.com/user-attachments/assets/3a28e5de-8c1d-4a76-a189-fd5f2eaeb589)
-
-Key functionalities include similarity searches, knowledge base exploration for past requests, and cluster analysis insights for managers. This application is a foundational piece in an evolving use case story, with plans to integrate advanced AI agents, SAP Joule, SAP Knowledge Graph, and other innovative technologies. Stay tuned for future updates as we enhance this smart advisory companion.
+wip
 
 ## Persona
-[<img src="https://github.com/user-attachments/assets/e8369e6a-9d35-43f3-aceb-4d19ad6623c0"/>](https://github.com/user-attachments/assets/e8369e6a-9d35-43f3-aceb-4d19ad6623c0)
+wip
 
 ## Solution Architecture
-tbc
+wip
 <!-- [<img src="https://github.com/SAP-samples/btp-generative-ai-hub-use-cases/assets/8436161/a826c07b-304e-4849-9ac0-493a739536d6"/>](https://github.com/SAP-samples/btp-generative-ai-hub-use-cases/assets/8436161/a826c07b-304e-4849-9ac0-493a739536d6) -->
 
 ## Pre-requisites
