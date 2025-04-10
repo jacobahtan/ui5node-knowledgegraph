@@ -19,9 +19,14 @@ wip
 Below are some setup steps that are required to ensure a success deployment of the application.
 - make sure the python endpoint is up and running.
 
-## Steps to Deploy
+## Steps to Run Locally (for development)
+- create an .env file in root level
+- in the .env file, have the following values PY_ENDPOINT="https://indb-embedding.cfapps.eu12.hana.ondemand.com"
+- you may refer to .env_sample.
 - npm install
 - to run locally: node app.js
+
+## Steps to Deploy
 - cf login
 - cf push ui5node-poc-knowledgegraph -k 256MB -m 256MB
 - cf set-env ui5node-poc-knowledgegraph PY_ENDPOINT https://indb-embedding.cfapps.eu12.hana.ondemand.com
