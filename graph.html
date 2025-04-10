@@ -23,6 +23,7 @@
             font-size: 14px;
             font-weight: normal;
             box-sizing: border-box;
+            resize: vertical;
         }
 
         button {
@@ -167,6 +168,29 @@
     <div id="loading-indicator">Loading...</div>
 
     <script>
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const payloadInput = document.getElementById('payload-input');
+
+            payloadInput.addEventListener('input', () => {
+                payloadInput.style.height = 'auto'; // Reset height to recalculate
+                payloadInput.style.height = payloadInput.scrollHeight + 'px'; // Set height to scrollHeight
+            });
+        });
+
+        // Function to check localStorage and update textarea
+        function checkLocalStorage() {
+            const storedSparql = localStorage.getItem('ontology-sparql');
+            const payloadInput = document.getElementById('payload-input');
+            if (storedSparql && storedSparql !== payloadInput.value) {
+                payloadInput.value = storedSparql;
+                console.log("Updated payload input from localStorage.");
+            }
+        }
+
+        // Set interval to check localStorage every 5 seconds (5000 milliseconds)
+        setInterval(checkLocalStorage, 2000);
+
         document.getElementById('fetch-ontology').addEventListener('click', async () => {
             document.getElementById('loading-indicator').style.display = 'block';
             try {

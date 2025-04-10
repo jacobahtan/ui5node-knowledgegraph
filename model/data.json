@@ -27,12 +27,16 @@
 			"expanded": true,
 			"items": [
 				{
-					"title": "Data Blueprint Discovery",
+					"title": "Knowledge Graph Discovery",
 					"key": "page6"
 				},
 				{
 					"title": "Enhanced Advisory Buddy",
 					"key": "page7"
+				},
+				{
+					"title": "SPARQL Explorer",
+					"key": "page8"
 				}
 			]
 		},

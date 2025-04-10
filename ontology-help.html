@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knowledge Base</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+        }
+        h1, h2, h3 {
+            color: #333;
+        }
+        .class-section, .entity-section {
+            margin-bottom: 20px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 5px;
+        }
+        .item {
+            margin-bottom: 10px;
+        }
+        .item-name {
+            font-weight: bold;
+        }
+        .item-description {
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>Knowledge Base</h1>
+
+    <div id="knowledge-base">
+        </div>
+
+    <script>
+        const knowledgeBaseDiv = document.getElementById('knowledge-base');
+
+        // Sample data structure for your ontology
+        const data = {
+            classes: [
+                {
+                    name: "Person",
+                    description: "A human being."
+                },
+                {
+                    name: "Organization",
+                    description: "A structured group of people with a particular purpose."
+                },
+                {
+                    name: "Product",
+                    description: "An article or substance that is manufactured or refined for sale."
+                }
+            ],
+            entities: [
+                {
+                    name: "Alice",
+                    type: "Person",
+                    description: "A software engineer working at Example Corp."
+                },
+                {
+                    name: "Example Corp",
+                    type: "Organization",
+                    description: "A leading technology company."
+                },
+                {
+                    name: "Laptop X1",
+                    type: "Product",
+                    description: "A high-performance laptop with a 15-inch screen."
+                },
+                {
+                    name: "Bob",
+                    type: "Person",
+                    description: "A marketing manager."
+                }
+            ]
+        };
+
+        // Function to render classes
+        function renderClasses(classes) {
+            if (classes && classes.length > 0) {
+                const classSection = document.createElement('div');
+                classSection.classList.add('class-section');
+                classSection.innerHTML = '<h2>Ontology Classes</h2>';
+                classes.forEach(cls => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.classList.add('item');
+                    itemDiv.innerHTML = `<h3 class="item-name">${cls.name}</h3><p class="item-description">${cls.description}</p>`;
+                    classSection.appendChild(itemDiv);
+                });
+                knowledgeBaseDiv.appendChild(classSection);
+            }
+        }
+
+        // Function to render entities
+        function renderEntities(entities) {
+            if (entities && entities.length > 0) {
+                const entitySection = document.createElement('div');
+                entitySection.classList.add('entity-section');
+                entitySection.innerHTML = '<h2>Entities</h2>';
+                entities.forEach(entity => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.classList.add('item');
+                    itemDiv.innerHTML = `<h3 class="item-name">${entity.name}</h3><p class="item-description"><strong>Type:</strong> ${entity.type}<br>${entity.description}</p>`;
+                    entitySection.appendChild(itemDiv);
+                });
+                knowledgeBaseDiv.appendChild(entitySection);
+            }
+        }
+
+        // Render the data
+        renderClasses(data.classes);
+        renderEntities(data.entities);
+    </script>
+</body>
+</html>
