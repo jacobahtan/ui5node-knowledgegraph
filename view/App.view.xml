@@ -130,7 +130,6 @@
                         <headerContent>
                             <Title text="Advisory Buddy Search Tool" class="sapUiSmallMargin"/>
                             <ToolbarSpacer />
-							<Button text="Show Ontology"/>
                         </headerContent>
                         <content>
 							<core:Fragment fragmentName="chat.view.FPage2AdvisoryBuddy" id="FPage2AdvisoryBuddy" type="XML"/>

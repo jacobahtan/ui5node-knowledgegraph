@@ -68,7 +68,7 @@
             border: 1px solid #ccc;
             padding: 10px;
             border-radius: 5px;
-            font-size: 0.9em;
+            font-size: 12px;
             opacity: 0;
             pointer-events: none;
             font-family: "72", "72full", Arial, Helvetica, sans-serif;
@@ -86,6 +86,7 @@
             transition: opacity 0.3s ease-in-out;
             font-family: "72", "72full", Arial, Helvetica, sans-serif;
             font-size: 10px;
+            white-space: pre-wrap; /* Allow line breaks in toast */
         }
         .toast.show {
             opacity: 1;
@@ -376,15 +377,19 @@ WHERE {
             const nodeDescriptions = {};
             const propertyTypes = {};
             const nodeOwlTypes = {};
+            const nodeNamespaces = {}; // <-- To store namespaces
             const predicateUris = new Set();
             const potentialNodeUris = new Set(); // <--- Store URIs that could be nodes
             const connectedNodeUris = new Set(); // Track nodes that are connected by links
+            const nodeRelationships = {}; // <-- Node ID to Relationships mapping
 
             // --- Pass 1: Collect Metadata and Identify Predicates/Potential Nodes ---
             triples.forEach(triple => {
                 const { subject, predicate, object } = triple;
                 const subjectUri = subject.startsWith("<") ? subject.slice(1,-1) : subject;
                 const predicateUri = predicate.startsWith("<") ? predicate.slice(1,-1) : predicate;
+                // console.log(predicateUri);
+                // console.log(subjectUri);
                 const objectValue = object.startsWith("<") ? object.slice(1,-1) : object;
 
                 // Store labels
@@ -412,11 +417,19 @@ WHERE {
                          } else if (typeName === 'Class' || typeName === 'NamedIndividual' || typeName === 'Ontology') {
                               nodeOwlTypes[subjectUri] = typeName;
                               potentialNodeUris.add(subjectUri); // It's a typed resource, potential node
+
+                              nodeNamespaces[subjectUri] = "http://www.w3.org/2002/07/owl#" + typeName; // Store namespace
                           }
                      } else {
                           // Store custom type name if it exists
                           nodeOwlTypes[subjectUri] = getLocalName(typeUri);
                           potentialNodeUris.add(subjectUri); // Assume typed things are nodes unless known predicates
+
+                          // --- Capture Namespace for custom types ---
+                            const namespace = typeUri.substring(0, typeUri.lastIndexOf('/') + 1);
+                            if (namespace) {
+                                nodeNamespaces[subjectUri] = namespace;
+                            }
                       }
                      // Keep this subject as a potential node for now, unless explicitly marked as predicate
                      if (!predicateUris.has(subjectUri)) {
@@ -437,11 +450,13 @@ WHERE {
                 // Create node only if it's NOT identified as a predicate URI
                 if (!predicateUris.has(uri)) {
                     if (!nodes[uri]) { // Avoid duplicates if somehow added twice
+                        console.log(getLocalName(uri));
                         nodes[uri] = {
                             id: uri,
                             type: nodeOwlTypes[uri] || 'Resource', // Use specific type or fallback
                             label: nodeLabels[uri] || getLocalName(uri),
-                            description: nodeDescriptions[uri] || ""
+                            description: nodeDescriptions[uri] || "",
+                            namespace: nodeNamespaces[uri] // <-- ADD THIS: Store namespace in node
                         };
                     }
                 }
@@ -476,6 +491,25 @@ WHERE {
                             type: predicateUri,
                             propertyTypeName: propTypeName || inferredTypeName
                         });
+
+                        // Store relationships for the source node
+                        if (!nodeRelationships[subjectUri]) {
+                            nodeRelationships[subjectUri] = [];
+                        }
+                        nodeRelationships[subjectUri].push({
+                            predicate: predicateUri,
+                            targetLabel: nodes[objectUri].label
+                        });
+
+                        // Store relationships for the target node
+                        if (!nodeRelationships[objectUri]) {
+                            nodeRelationships[objectUri] = [];
+                        }
+                        nodeRelationships[objectUri].push({
+                            predicate: predicateUri,
+                            sourceLabel: nodes[subjectUri].label
+                        });
+
                         // Mark both subject and object as connected
                         connectedNodeUris.add(subjectUri);
                         connectedNodeUris.add(objectUri);
@@ -492,12 +526,13 @@ WHERE {
                 return true;
             });
 
-            return { nodes: filteredNodes, links: links };
+            return { nodes: filteredNodes, links: links, nodeRelationships: nodeRelationships};
         }
 
         function getNodeType(nodeId) {
             if (nodeId.includes("#")) {
                 const lastPart = nodeId.split("#").pop();
+                console.log("Last part:", lastPart);
                 if (lastPart.includes("Property")) {
                     return "property";
                 } else if (lastPart.charAt(0) === lastPart.charAt(0).toUpperCase()) {
@@ -523,7 +558,7 @@ WHERE {
 
             // --- Define Colors for Property Types --- <--- NEW
             const propertyTypeColors = {
-                "ObjectProperty": "#1f77b4", // Blue
+                "ObjectProperty": "#328ded", // Blue
                 "DatatypeProperty": "#ff7f0e", // Orange
                 "FunctionalProperty": "#2ca02c", // Green
                 "AnnotationProperty": "#d62728", // Red
@@ -549,16 +584,24 @@ WHERE {
             svg.call(zoom)
                .on("wheel.zoom", null);
 
+            // Define base and highlight sizes
+            const baseArrowSize = 10;
+            const highlightArrowSize = 6;
+            const baseLinkWidth = 1;
+            const highlightLinkWidth = 2.5;
+
             svg.append("defs").selectAll("marker")
                 // ... (marker definition remains the same) ...
                  .data(["arrow"])
                  .enter().append("marker")
                  .attr("id", d => d)
                  .attr("viewBox", "0 -5 10 10")
-                 .attr("refX", 22) // Adjust for node radius/size
+                 .attr("refX", 18) // Adjust for node radius/size
                  .attr("refY", 0)
-                 .attr("markerWidth", 10)
-                 .attr("markerHeight", 10)
+                 .attr("markerWidth", baseArrowSize)
+                 .attr("markerHeight", baseArrowSize)
+                //  .attr("markerWidth", 10)
+                //  .attr("markerHeight", 10)
                  .attr("orient", "auto")
                  .append("path")
                  .attr("d", "M0,-5L10,0L0,5")
@@ -578,6 +621,7 @@ WHERE {
                 .attr("class", "link")
                 // --- Updated Link Styling ---
                 .style("stroke", d => getLinkColor(d)) // Use function to get color
+                // .style("stroke-width", baseLinkWidth) // Apply base width
                 .style("stroke-dasharray", () => { // Keep existing style options
                     if (currentLinkStyle === "dashed") return "5,5";
                     if (currentLinkStyle === "dotted") return "1,3";
@@ -604,15 +648,16 @@ WHERE {
                  .attr("class", "node")
                  .on('mouseover', handleMouseOver) // Add mouseover event
                  .on('mouseout', handleMouseOut)   // Add mouseout event
-                 .on("click", (event, d) => {
-                     console.log(d);
-                     // Display more info if available
-                     let message = `ID: ${d.id}\nLabel: ${d.label}\nType: ${d.type}`;
-                     if (d.description) {
-                          message += `\nComments: ${d.description}`;
-                      }
-                      showToast(message);
-                  })
+                //  .on("click", (event, d) => {
+                //      console.log(d);
+                //      // Display more info if available
+                //      let message = `ID: ${d.id}\nLabel: ${d.label}\nType: ${d.type}`;
+                //      if (d.description) {
+                //           message += `\nComments: ${d.description}`;
+                //       }
+                //       showToast(message);
+                //   })
+                 .on("click", handleNodeClick)
                  .call(d3.drag()
                      .on("start", dragstarted)
                      .on("drag", dragged)
@@ -622,8 +667,9 @@ WHERE {
                  .filter(d => d.type !== "property") // Assuming 'property' type derived from getNodeType needs review based on ontology
                  .attr("r", 12)
                  .style("fill", d => {
+                    console.log(d.type);
                      if (d.type === "class") return "lightblue";
-                     if (d.type === "property") return "lightgreen"; // Maybe map OWL property types here?
+                     if (d.type === "Resource") return "lightgreen"; // Maybe map OWL property types here?
                      if (d.type === "instance") return "orange";
                      return "#a6cee3"; // Default color
                  })
@@ -674,7 +720,7 @@ WHERE {
 
             // --- Update Legend Data --- <--- NEW/UPDATED
             const nodeLegendData = [
-                 { label: "Class", shape: "circle", color: "lightblue" }
+                 { label: "Class", shape: "circle", color: "#a6cee3" }
                 //  { label: "Property Resource", shape: "rect", color: "lightgreen" }, // If properties are distinct nodes
                 //  { label: "Instance", shape: "circle", color: "orange" },
                 //  { label: "Other Resource", shape: "circle", color: "#a6cee3" }
@@ -749,6 +795,13 @@ WHERE {
                  .attr("dy", "0.35em")
                  .text(d => d.label);
 
+            function handleNodeClick(event, d) { /* ... */
+                 console.log("Clicked Node:", d); 
+                 let message = `Label: ${d.label}\nType: ${d.type}\nID: ${d.id}`; 
+                 if (d.description) message += `\nComments: ${d.description}`; 
+                 showToast(message, currentGraphData.nodeRelationships[d.id]);
+             }
+
 
             // --- Rest of the functions (drag, zoom, toast, etc.) remain the same ---
              function dragstarted(event) {
@@ -768,9 +821,18 @@ WHERE {
                  event.subject.fy = null;
              }
 
-             function showToast(message) {
-                 toastDiv.text(message).classed("show", true);
-                 setTimeout(() => toastDiv.classed("show", false), 5000);
+             function showToast(message, relationships) {
+                let fullMessage = message;
+                if (relationships && relationships.length > 0) {
+                    fullMessage += "\n\nRelationships:\n";
+                    relationships.forEach(rel => {
+                        const predicateLocalName = getLocalName(rel.predicate);
+                        const otherLabel = rel.targetLabel || rel.sourceLabel;
+                        fullMessage += `- ${predicateLocalName} ${otherLabel}\n`;
+                    });
+                }
+                toastDiv.text(fullMessage).classed("show", true);
+                setTimeout(() => toastDiv.classed("show", false), 5000);
              }
 
              function zoomed(event) {
@@ -778,22 +840,60 @@ WHERE {
                  zoomSlider.property("value", event.transform.k); // Update slider value
              }
              function handleMouseOver(event, d) {
-                 const nodeElement = d3.select(this);
+                //  const nodeElement = d3.select(this);
+                //  nodeElement.classed('highlighted-node', true);
+
+                // link.filter(l => l.source.id === d.id || l.target.id === d.id)
+                //      .classed('highlighted-link', true)
+                //      .raise(); // Bring highlighted links to front
+
+                // link.filter(l => l.source.id === d.id || l.target.id === d.id).classed('highlighted-link', true).raise();
+
+                // d3.select("#arrow")  // Select the marker and change its size
+                //     .attr("markerWidth", 12)
+                //     .attr("markerHeight", 12);
+
+                const nodeElement = d3.select(this);
                  nodeElement.classed('highlighted-node', true);
 
-                 link.filter(l => l.source.id === d.id || l.target.id === d.id)
-                     .classed('highlighted-link', true)
-                     .raise(); // Bring highlighted links to front
+                link.filter(l => l.source.id === d.id || l.target.id === d.id)
+                    .classed('highlighted-link', true)
+                    // .style("stroke-width", highlightLinkWidth) // Apply highlight width
+                    .raise();
 
-                 nodeElement.raise(); // Bring highlighted node to front
+                d3.select("#arrow")  // Select the marker and change its size
+                    .attr("markerWidth", highlightArrowSize)
+                    .attr("markerHeight", highlightArrowSize);
+
+                    nodeElement.raise();
+
+                //  nodeElement.raise(); // Bring highlighted node to front
+                // const nodeElement = d3.select(this).classed('highlighted-node', true).raise();
+                console.log(d);
+                tooltipDiv.transition().duration(200).style("opacity", .9);
+                tooltipDiv.html(`<strong>${d.label}</strong> (${d.type})<br>${d.description}<br><br>${d.id}<br>Namespace: ${d.namespace}`).style("left", (event.pageX + 15) + "px").style("top", (event.pageY - 28) + "px");
              }
 
              function handleMouseOut(event, d) {
                  const nodeElement = d3.select(this);
                  nodeElement.classed('highlighted-node', false);
 
-                 link.filter(l => l.source.id === d.id || l.target.id === d.id)
-                     .classed('highlighted-link', false);
+                // link.filter(l => l.source.id === d.id || l.target.id === d.id)
+                //      .classed('highlighted-link', false);
+
+                // d3.select("#arrow")  // Select the marker and change its size
+                //     .attr("markerWidth", 10)
+                //     .attr("markerHeight", 10);
+
+                link.filter(l => l.source.id === d.id || l.target.id === d.id)
+                    .classed('highlighted-link', false)
+                    // .style("stroke-width", baseLinkWidth);    // Revert to base width
+
+                d3.select("#arrow")  // Select the marker and revert its size
+                    .attr("markerWidth", baseArrowSize)
+                    .attr("markerHeight", baseArrowSize);
+
+                tooltipDiv.transition().duration(500).style("opacity", 0);
              }
             // Debounce function...
               function debounce(func, delay) {
