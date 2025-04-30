@@ -14,6 +14,13 @@ app.get('/getenvironmentvariables', function (req, res) {
     res.send(JSON.stringify(xvar))
 });
 
+app.get('/getkgendpoint', function (req, res) {
+    var xvar = process.env.KG_ENDPOINT;
+    res.setHeader('Content-Type', 'application/json')
+    res.status(200)
+    res.send(JSON.stringify(xvar))
+});
+
 var port = process.env.PORT || 30000;
 
 app.listen(port, function () {

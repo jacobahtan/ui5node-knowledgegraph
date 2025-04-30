@@ -31,7 +31,7 @@
 
     <f:SidePanel id="mySidePanelForExplorer" actionBarExpanded="false" sidePanelResizable="true" sidePanelWidth="56%" toggle="onToggle">
         <f:mainContent>
-            <html:iframe id="chart" src="ontology-construct-temp.html" style="-webkit-transform: scale(1); transform: scale(1); -webkit-transform-origin: 0 0; transform-origin: 0 0;" frameBorder="0" height="1200px" width="100%" scrolling="yes">
+            <html:iframe id="chart" src="d3/kg_discovery_construct.html" style="-webkit-transform: scale(1); transform: scale(1); -webkit-transform-origin: 0 0; transform-origin: 0 0;" frameBorder="0" height="1200px" width="100%" scrolling="yes">
             </html:iframe>
         </f:mainContent>
         <f:items>

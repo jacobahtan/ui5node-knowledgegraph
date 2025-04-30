@@ -23,7 +23,7 @@
             <card:Header title="Cluster Analysis of Trending Cluster Categories" subtitle="Grouping &amp; Comparing Advisories Requests by Cluster" />
         </f:header>
         <f:content>
-            <html:iframe id="chart" src="cluster_category_analysis.html" style="-webkit-transform: scale(1); transform: scale(1); -webkit-transform-origin: 0 0; transform-origin: 0 0;" frameBorder="0" height="900px" width="100%" scrolling="yes"/>
+            <html:iframe id="chart" src="d3/cluster_category_analysis.html" style="-webkit-transform: scale(1); transform: scale(1); -webkit-transform-origin: 0 0; transform-origin: 0 0;" frameBorder="0" height="900px" width="100%" scrolling="yes"/>
         </f:content>
     </f:Card>
 
@@ -35,7 +35,7 @@
             <card:Header title="Project Distribution by Cluster" subtitle="Breakdown of Projects by Architect" />
         </f:header>
         <f:content>
-            <html:iframe id="clusterExpertChart" src="cluster_project_by_expert.html" style="-webkit-transform: scale(1); transform: scale(1); -webkit-transform-origin: 0 0; transform-origin: 0 0;" frameBorder="0" height="900px" width="100%" scrolling="yes"/>
+            <html:iframe id="clusterExpertChart" src="d3/cluster_project_by_expert.html" style="-webkit-transform: scale(1); transform: scale(1); -webkit-transform-origin: 0 0; transform-origin: 0 0;" frameBorder="0" height="900px" width="100%" scrolling="yes"/>
         </f:content>
     </f:Card>
 </core:FragmentDefinition>

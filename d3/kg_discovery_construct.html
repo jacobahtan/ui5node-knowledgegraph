@@ -232,6 +232,8 @@
         let zoom; // Declare zoom outside renderGraph
         let g;
 
+        let KG_CONSTRUCT_EXECUTE_EP;
+
         const initialSparqlQuery = 
 `prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#>
@@ -273,6 +275,26 @@ WHERE {
     }
 } ORDER BY ?p`;
 
+        fetch("/getkgendpoint")
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                const pyEndpoint = data;
+                console.log("Python endpoint:", pyEndpoint);
+
+                KG_CONSTRUCT_EXECUTE_EP = pyEndpoint + "/execute_query_raw?format=csv";
+
+                // Initial chart drawing (using initial data if available)
+                fetchDataAndRender(initialSparqlQuery); // Call to draw the initial chart
+            })
+            .catch(error => {
+                console.error("Error fetching environment variable:", error);
+            });
+
         sparqlQueryTextArea.property("value", initialSparqlQuery);
 
         controlsToggle.on("click", () => {
@@ -313,7 +335,7 @@ WHERE {
         });
 
         function fetchDataAndRender(query = initialSparqlQuery) {
-            fetch(apiUrl, {
+            fetch(KG_CONSTRUCT_EXECUTE_EP, {
                 method: "POST",
                 headers: {
                     "Content-Type": "text/plain"
@@ -669,9 +691,9 @@ WHERE {
                  .style("fill", d => {
                     console.log(d.type);
                      if (d.type === "class") return "lightblue";
-                     if (d.type === "Resource") return "lightgreen"; // Maybe map OWL property types here?
+                     if (d.type === "Resource") return "#13ebbcd4"; // Maybe map OWL property types here?
                      if (d.type === "instance") return "orange";
-                     return "#a6cee3"; // Default color
+                     return "#a6cee3b2"; // Default color
                  })
                  .style("stroke", "#333")
                  .style("stroke-width", 1.5);
@@ -720,7 +742,8 @@ WHERE {
 
             // --- Update Legend Data --- <--- NEW/UPDATED
             const nodeLegendData = [
-                 { label: "Class", shape: "circle", color: "#a6cee3" }
+                 { label: "Class", shape: "circle", color: "#a6cee3b2" },
+                 { label: "Resource", shape: "circle", color: "#13ebbcd4" }
                 //  { label: "Property Resource", shape: "rect", color: "lightgreen" }, // If properties are distinct nodes
                 //  { label: "Instance", shape: "circle", color: "orange" },
                 //  { label: "Other Resource", shape: "circle", color: "#a6cee3" }
@@ -917,8 +940,8 @@ WHERE {
                  zoom.scaleTo(svg.transition().duration(300), +this.value);
              });
 
-             svg.call(zoom.transform, d3.zoomIdentity.scale(0.7));
-             zoomSlider.property("value", 0.7);
+             svg.call(zoom.transform, d3.zoomIdentity.scale(0.8));
+             zoomSlider.property("value", 0.8);
 
              window.addEventListener("resize", debounce(() => renderGraph(currentGraphData), 250));
              document.getElementById('search-bar').addEventListener('input', (event) => {
@@ -949,7 +972,7 @@ WHERE {
              });
         } // End of renderGraph
 
-        fetchDataAndRender(initialSparqlQuery);
+        
     </script>
 </body>
 </html>
